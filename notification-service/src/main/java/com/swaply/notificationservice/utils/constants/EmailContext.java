@@ -185,7 +185,7 @@ public class EmailContext {
                 <div class="email-container">
                     <!-- Header -->
                     <div class="header">
-                        <div class="logo">Swap<span>ly</span></div>
+                        <div class="logo">Net<span>bazar</span></div>
                     </div>
             
                     <!-- Content -->
@@ -452,7 +452,7 @@ public class EmailContext {
                 <body>
                     <div class="email-container">
                         <div class="header">
-                            <div class="logo">Swap<span>ly</span></div>
+                            <div class="logo">Net<span>bazar</span></div>
                         </div>
 
                         <div class="content">
@@ -847,7 +847,7 @@ public class EmailContext {
                     <div class="email-container">
                         <!-- Header -->
                         <div class="header">
-                            <div class="logo">Swap<span>ly</span></div>
+                            <div class="logo">Net<span>bazar</span></div>
                             <div class="support-badge">🎧 Dəstək Komandası</div>
                         </div>
                 

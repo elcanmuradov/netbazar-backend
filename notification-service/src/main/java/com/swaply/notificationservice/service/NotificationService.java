@@ -33,6 +33,7 @@ public class NotificationService {
 
     @Async
     public void sendVerificationEmail(VerificationRequest request) {
+        log.debug("Sending verification email from {}", fromEmail);
         JavaMailSender mailSender = mailSenderProvider.getIfAvailable();
         if (!mailEnabled) {
             log.warn("Email sending is disabled; skipping verification email for {}", request.email);
@@ -40,23 +41,24 @@ public class NotificationService {
         }
 
         if (mailSender == null || fromEmail == null || fromEmail.isBlank()) {
-            throw new NotificationException("JavaMailSender or FROM_EMAIL is not configured");
-        } else {
-            try {
-                MimeMessage message = mailSender.createMimeMessage();
-                MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-                helper.setFrom(fromEmail);
-                helper.setTo(request.email);
-                helper.setSubject("Your verification code is...");
-                helper.setText(EmailContext.setToken(request.token), true);
+            log.warn("JavaMailSender or FROM_EMAIL is not configured; skipping verification email for {}", request.email);
+            return;
+        }
 
-                mailSender.send(message);
-                log.info("Email has been sent to {}", request.email);
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setFrom(fromEmail);
+            helper.setTo(request.email);
+            helper.setSubject("Your verification code is...");
+            helper.setText(EmailContext.setToken(request.token), true);
 
-            } catch (MessagingException | RuntimeException e) {
-                log.warn("SMTP email send failed for {}: {}", request.email, e.getMessage());
-                throw new NotificationException("SMTP email send failed: " + e.getMessage());
-            }
+            mailSender.send(message);
+            log.info("Email has been sent to {}", request.email);
+
+        } catch (MessagingException | RuntimeException e) {
+            log.warn("SMTP email send failed for {}: {}", request.email, e.getMessage());
+            throw new NotificationException("SMTP email send failed: " + e.getMessage());
         }
     }
 
@@ -69,7 +71,8 @@ public class NotificationService {
         }
 
         if (mailSender == null || fromEmail == null || fromEmail.isBlank()) {
-            throw new NotificationException("JavaMailSender or FROM_EMAIL is not configured");
+            log.warn("JavaMailSender or FROM_EMAIL is not configured; skipping product deletion email for {}", request.email);
+            return;
         }
 
         try {
@@ -97,7 +100,8 @@ public class NotificationService {
         }
 
         if (mailSender == null || fromEmail == null || fromEmail.isBlank()) {
-            throw new NotificationException("JavaMailSender or FROM_EMAIL is not configured");
+            log.warn("JavaMailSender or FROM_EMAIL is not configured; skipping ticket response email for {}", ticket.getUserEmail());
+            return;
         }
 
         try {
@@ -106,7 +110,7 @@ public class NotificationService {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             helper.setFrom(fromEmail);
             helper.setTo(ticket.getUserEmail());
-            helper.setSubject("Swaply - Şikayətinizə cavab");
+            helper.setSubject("Netbazar - Şikayətinizə cavab");
             helper.setText(EmailContext.setResponseReportMessage(ticket), true);
 
             mailSender.send(message);
