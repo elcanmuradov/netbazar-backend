@@ -33,7 +33,6 @@ public class NotificationService {
 
     @Async
     public void sendVerificationEmail(VerificationRequest request) {
-        log.debug("Sending verification email from {}", fromEmail);
         JavaMailSender mailSender = mailSenderProvider.getIfAvailable();
         if (!mailEnabled) {
             log.warn("Email sending is disabled; skipping verification email for {}", request.email);
