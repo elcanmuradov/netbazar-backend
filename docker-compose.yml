@@ -285,6 +285,7 @@ services:
       SPRING_MAIL_SMTP_TIMEOUT: ${SPRING_MAIL_SMTP_TIMEOUT:-5000}
       SPRING_MAIL_SMTP_WRITE_TIMEOUT: ${SPRING_MAIL_SMTP_WRITE_TIMEOUT:-5000}
       FROM_EMAIL: ${FROM_EMAIL:-info@netbazar.tech}
+      FROM_DISPLAY_NAME: ${FROM_DISPLAY_NAME:-Netbazar}
       SPRING_PROFILES_ACTIVE: docker
     restart: unless-stopped
     networks: [ microservices-net ]

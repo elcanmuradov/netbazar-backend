@@ -122,7 +122,7 @@ public class ChatService {
                 .map(otherUserId -> {
                     String name = "İstifadəçi " + otherUserId.toString().substring(0, 5);
                     if (SYSTEM_ADMIN_ID.equals(otherUserId)) {
-                        name = "Swaply Admin";
+                        name = "Netbazar Admin";
                     }
                     try {
                         UserDto userDto = userClient.getUserById(otherUserId, token).getData();
@@ -201,7 +201,7 @@ public class ChatService {
                 
                 Qayda pozuntusu : %s
                 
-                Bu emaili Swaply komandası göndərdi.
+                Bu emaili Netbazar komandası göndərdi.
                 Bu, avtomatik göndərilən bildiriş mesajıdır.
                 
                 """, safeProductTitle, safeReason);

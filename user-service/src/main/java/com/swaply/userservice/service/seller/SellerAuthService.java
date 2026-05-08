@@ -47,6 +47,7 @@ public class SellerAuthService {
 
         Seller seller = Seller.builder()
                 .name(registerRequest.getName())
+                .username(registerRequest.getEmail())
                 .email(registerRequest.getEmail())
                 .phone(registerRequest.getPhone())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))

@@ -11,6 +11,9 @@ import java.time.format.DateTimeFormatter;
 @UtilityClass
 public class EmailContext {
 
+    /** Inbox / HTML branding (must match product name; avoids wrong name in Gmail snippet/header). */
+    private static final String BRAND = "Netbazar";
+
     private static final ZoneId UTC_ZONE = ZoneId.of("UTC");
     private static final ZoneId BAKU_ZONE = ZoneId.of("Asia/Baku");
     private static final DateTimeFormatter EMAIL_DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy  -  HH:mm");
@@ -22,7 +25,7 @@ public class EmailContext {
             <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Netbazar - Email Təsdiqi</title>
+                <title>%s - Email Təsdiqi</title>
                 <style>
                     * {
                         margin: 0;
@@ -58,7 +61,7 @@ public class EmailContext {
                         letter-spacing: 2px;
                     }
             
-                    .logo span {
+                    .logo .logo-accent {
                         color: #B38B59;
                     }
             
@@ -182,10 +185,11 @@ public class EmailContext {
                 </style>
             </head>
             <body>
+                <div style="display:none;max-height:0;overflow:hidden;font-size:0;line-height:0;color:#ffffff;opacity:0;mso-hide:all;">%s – email təsdiqi</div>
                 <div class="email-container">
                     <!-- Header -->
                     <div class="header">
-                        <div class="logo">Net<span>bazar</span></div>
+                        <div class="logo" aria-label="%s"><span class="logo-net">Net</span><span class="logo-accent">bazar</span></div>
                     </div>
             
                     <!-- Content -->
@@ -235,7 +239,7 @@ public class EmailContext {
                 </div>
             </body>
             </html>
-            """,token);
+            """, BRAND, BRAND, BRAND, token);
     }
 
 
@@ -244,13 +248,13 @@ public class EmailContext {
         String productTitle = escapeHtml(defaultIfBlank(request.productTitle, "Məhsul"));
         String reason = escapeHtml(defaultIfBlank(request.reason, "Qayda pozuntusu"));
 
-        return """
+        return String.format("""
                 <!DOCTYPE html>
                 <html lang="az">
                 <head>
                     <meta charset="UTF-8">
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>Netbazar - Məhsul Silindi</title>
+                    <title>%s - Məhsul Silindi</title>
                     <style>
                         * {
                             margin: 0;
@@ -286,7 +290,7 @@ public class EmailContext {
                             letter-spacing: 2px;
                         }
 
-                        .logo span {
+                        .logo .logo-accent {
                             color: #B38B59;
                         }
 
@@ -450,9 +454,10 @@ public class EmailContext {
                     </style>
                 </head>
                 <body>
+                    <div style="display:none;max-height:0;overflow:hidden;font-size:0;line-height:0;color:#ffffff;opacity:0;mso-hide:all;">%s – məhsul bildirişi</div>
                     <div class="email-container">
                         <div class="header">
-                            <div class="logo">Net<span>bazar</span></div>
+                            <div class="logo" aria-label="%s"><span class="logo-net">Net</span><span class="logo-accent">bazar</span></div>
                         </div>
 
                         <div class="content">
@@ -512,7 +517,7 @@ public class EmailContext {
                     </div>
                 </body>
                 </html>
-                """.formatted(reason, productTitle);
+                """, BRAND, BRAND, BRAND, reason, productTitle);
     }
 
     public static String setResponseReportMessage(TicketDto ticket) {
@@ -522,7 +527,7 @@ public class EmailContext {
                         <head>
                             <meta charset="UTF-8">
                             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                            <title>Netbazar - Dəstək Cavabı</title>
+                            <title>%s - Dəstək Cavabı</title>
                             <style>
                                 * {
                                     margin: 0;
@@ -558,7 +563,7 @@ public class EmailContext {
                                     letter-spacing: 2px;
                                 }
                         
-                                .logo span {
+                                .logo .logo-accent {
                                     color: #B38B59;
                                 }
                         
@@ -844,10 +849,11 @@ public class EmailContext {
                             </style>
                         </head>
                 <body>
+                    <div style="display:none;max-height:0;overflow:hidden;font-size:0;line-height:0;color:#ffffff;opacity:0;mso-hide:all;">%s – dəstək cavabı</div>
                     <div class="email-container">
                         <!-- Header -->
                         <div class="header">
-                            <div class="logo">Net<span>bazar</span></div>
+                            <div class="logo" aria-label="%s"><span class="logo-net">Net</span><span class="logo-accent">bazar</span></div>
                             <div class="support-badge">🎧 Dəstək Komandası</div>
                         </div>
                 
@@ -947,6 +953,9 @@ public class EmailContext {
                 </body>
                 </html>
                 """
+                ,BRAND
+                ,BRAND
+                ,BRAND
                 ,ticket.getUserName()
                 ,ticket.getId()
                 ,ticket.getTitle()

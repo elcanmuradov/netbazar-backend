@@ -6,6 +6,7 @@ import com.swaply.notificationservice.dto.VerificationRequest;
 import com.swaply.notificationservice.exception.NotificationException;
 import com.swaply.notificationservice.utils.constants.EmailContext;
 import jakarta.mail.MessagingException;
+import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,9 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 
 @Service
@@ -26,6 +30,9 @@ public class NotificationService {
 
     @Value("${FROM_EMAIL:${SPRING_MAIL_USERNAME:}}")
     private String fromEmail;
+
+    @Value("${mail.fromDisplayName:Netbazar}")
+    private String fromDisplayName;
 
     @Value("${MAIL_ENABLED:true}")
     private boolean mailEnabled;
@@ -47,9 +54,9 @@ public class NotificationService {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            helper.setFrom(fromEmail);
+            helper.setFrom(fromInternetAddress());
             helper.setTo(request.email);
-            helper.setSubject("Your verification code is...");
+            helper.setSubject("Netbazar - Email təsdiqi");
             helper.setText(EmailContext.setToken(request.token), true);
 
             mailSender.send(message);
@@ -77,9 +84,9 @@ public class NotificationService {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            helper.setFrom(fromEmail);
+            helper.setFrom(fromInternetAddress());
             helper.setTo(request.email);
-            helper.setSubject("Swaply - Məhsul silindi");
+            helper.setSubject("Netbazar - Məhsul silindi");
             helper.setText(EmailContext.setDeletedProductNotification(request), true);
 
             mailSender.send(message);
@@ -107,7 +114,7 @@ public class NotificationService {
             log.info("{}",ticket.toString());
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            helper.setFrom(fromEmail);
+            helper.setFrom(fromInternetAddress());
             helper.setTo(ticket.getUserEmail());
             helper.setSubject("Netbazar - Şikayətinizə cavab");
             helper.setText(EmailContext.setResponseReportMessage(ticket), true);
@@ -117,6 +124,17 @@ public class NotificationService {
         } catch (MessagingException | RuntimeException e) {
             log.warn("SMTP ticket response email send failed for {}: {}", ticket.getUserEmail(), e.getMessage());
             throw new NotificationException("SMTP email send failed: " + e.getMessage());
+        }
+    }
+
+    private InternetAddress fromInternetAddress() throws MessagingException {
+        try {
+            String personal = (fromDisplayName != null && !fromDisplayName.isBlank())
+                    ? fromDisplayName
+                    : "Netbazar";
+            return new InternetAddress(fromEmail, personal, StandardCharsets.UTF_8.name());
+        } catch (UnsupportedEncodingException e) {
+            throw new MessagingException("Invalid From address encoding", e);
         }
     }
 }

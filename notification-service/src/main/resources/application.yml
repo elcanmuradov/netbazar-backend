@@ -33,6 +33,7 @@ aws:
 
 mail:
   enabled: ${MAIL_ENABLED:true}
+  fromDisplayName: ${FROM_DISPLAY_NAME:Netbazar}
 
 management:
   health:

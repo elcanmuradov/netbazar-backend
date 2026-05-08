@@ -97,7 +97,7 @@ public class TicketService {
 
                 Cavab: %s
 
-                Bu mesaj Swaply komandası tərəfindən göndərilib.
+                Bu mesaj Netbazar komandası tərəfindən göndərilib.
                 """, ticketResponse.getTitle(), ticketResponse.getAdminResponse()))
             .sentAt(LocalDateTime.now().plusHours(4))
             .messageType(MessageType.SYSTEM)
