@@ -1,0 +1,247 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: copilot
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - tableExists:
+                tableName: customer_orders
+      changes:
+        - createTable:
+            tableName: customer_orders
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: buyer_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: seller_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: product_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: product_title
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: total_price
+                  type: DECIMAL(12,2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: quantity
+                  type: INTEGER
+                  defaultValue: 1
+                  constraints:
+                    nullable: false
+              - column:
+                  name: payment_method
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: delivery_city
+                  type: VARCHAR(100)
+              - column:
+                  name: discount_code
+                  type: VARCHAR(100)
+              - column:
+                  name: original_price
+                  type: DECIMAL(12,2)
+              - column:
+                  name: discount_amount
+                  type: DECIMAL(12,2)
+                  defaultValue: 0
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+
+  - changeSet:
+      id: 2
+      author: copilot
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - tableExists:
+                tableName: product_reviews
+      changes:
+        - createTable:
+            tableName: product_reviews
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: product_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_name
+                  type: VARCHAR(255)
+              - column:
+                  name: rating
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+              - column:
+                  name: comment
+                  type: TEXT
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+
+  - changeSet:
+      id: 3
+      author: copilot
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - tableExists:
+                tableName: discount_rules
+      changes:
+        - createTable:
+            tableName: discount_rules
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: code
+                  type: VARCHAR(100)
+                  constraints:
+                    unique: true
+              - column:
+                  name: type
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: value
+                  type: DECIMAL(12,2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: min_order_amount
+                  type: DECIMAL(12,2)
+              - column:
+                  name: max_discount_amount
+                  type: DECIMAL(12,2)
+              - column:
+                  name: min_quantity
+                  type: INTEGER
+              - column:
+                  name: start_date
+                  type: TIMESTAMP
+              - column:
+                  name: end_date
+                  type: TIMESTAMP
+              - column:
+                  name: usage_limit
+                  type: INTEGER
+              - column:
+                  name: usage_count
+                  type: INTEGER
+                  defaultValue: 0
+              - column:
+                  name: seller_id
+                  type: UUID
+              - column:
+                  name: product_id
+                  type: UUID
+              - column:
+                  name: is_active
+                  type: BOOLEAN
+                  defaultValue: true
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+
+  - changeSet:
+      id: 4
+      author: copilot
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - tableExists:
+                tableName: campaigns
+      changes:
+        - createTable:
+            tableName: campaigns
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: TEXT
+              - column:
+                  name: discount_type
+                  type: VARCHAR(20)
+                  defaultValue: PERCENTAGE
+              - column:
+                  name: discount_value
+                  type: DECIMAL(12,2)
+              - column:
+                  name: start_date
+                  type: TIMESTAMP
+              - column:
+                  name: end_date
+                  type: TIMESTAMP
+              - column:
+                  name: is_active
+                  type: BOOLEAN
+                  defaultValue: true
+              - column:
+                  name: banner_url
+                  type: VARCHAR(500)
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP

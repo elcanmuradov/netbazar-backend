@@ -1,0 +1,276 @@
+databaseChangeLog:
+  - changeSet:
+      id: 8
+      author: antigravity
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - tableExists:
+                tableName: banners
+      changes:
+        - createTable:
+            tableName: banners
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: title
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: image_url
+                  type: VARCHAR(500)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: link_url
+                  type: VARCHAR(500)
+              - column:
+                  name: placement
+                  type: VARCHAR(50)
+                  defaultValue: home
+              - column:
+                  name: sort_order
+                  type: INTEGER
+                  defaultValue: 0
+              - column:
+                  name: is_active
+                  type: BOOLEAN
+                  defaultValue: true
+              - column:
+                  name: start_date
+                  type: TIMESTAMP
+              - column:
+                  name: end_date
+                  type: TIMESTAMP
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+
+  - changeSet:
+      id: 9
+      author: antigravity
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - tableExists:
+                tableName: campaigns
+      changes:
+        - createTable:
+            tableName: campaigns
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: TEXT
+              - column:
+                  name: discount_type
+                  type: VARCHAR(20)
+                  defaultValue: PERCENTAGE
+              - column:
+                  name: discount_value
+                  type: DECIMAL(12,2)
+              - column:
+                  name: start_date
+                  type: TIMESTAMP
+              - column:
+                  name: end_date
+                  type: TIMESTAMP
+              - column:
+                  name: is_active
+                  type: BOOLEAN
+                  defaultValue: true
+              - column:
+                  name: banner_url
+                  type: VARCHAR(500)
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+
+  - changeSet:
+      id: 10
+      author: antigravity
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - tableExists:
+                tableName: blog_posts
+      changes:
+        - createTable:
+            tableName: blog_posts
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: title
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: slug
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: content
+                  type: TEXT
+              - column:
+                  name: cover_image_url
+                  type: VARCHAR(500)
+              - column:
+                  name: category_name
+                  type: VARCHAR(100)
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  defaultValue: DRAFT
+              - column:
+                  name: scheduled_at
+                  type: TIMESTAMP
+              - column:
+                  name: author_id
+                  type: UUID
+              - column:
+                  name: meta_title
+                  type: VARCHAR(255)
+              - column:
+                  name: meta_description
+                  type: TEXT
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+
+  - changeSet:
+      id: 11
+      author: antigravity
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - tableExists:
+                tableName: static_pages
+      changes:
+        - createTable:
+            tableName: static_pages
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: slug
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: title
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: content
+                  type: TEXT
+              - column:
+                  name: meta_title
+                  type: VARCHAR(255)
+              - column:
+                  name: meta_description
+                  type: TEXT
+              - column:
+                  name: is_published
+                  type: BOOLEAN
+                  defaultValue: true
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+
+  - changeSet:
+      id: 12
+      author: antigravity
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - tableExists:
+                tableName: categories
+      changes:
+        - createTable:
+            tableName: categories
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: slug
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: icon_url
+                  type: VARCHAR(500)
+              - column:
+                  name: parent_id
+                  type: UUID
+              - column:
+                  name: sort_order
+                  type: INTEGER
+                  defaultValue: 0
+              - column:
+                  name: is_active
+                  type: BOOLEAN
+                  defaultValue: true
+              - column:
+                  name: meta_title
+                  type: VARCHAR(255)
+              - column:
+                  name: meta_description
+                  type: TEXT
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP

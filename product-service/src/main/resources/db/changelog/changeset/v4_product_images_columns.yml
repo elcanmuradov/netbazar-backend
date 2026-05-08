@@ -1,0 +1,52 @@
+databaseChangeLog:
+  - changeSet:
+      id: 13
+      author: antigravity
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - columnExists:
+                tableName: product_images
+                columnName: public_id
+      changes:
+        - addColumn:
+            tableName: product_images
+            columns:
+              - column:
+                  name: public_id
+                  type: VARCHAR(255)
+
+  - changeSet:
+      id: 14
+      author: antigravity
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - columnExists:
+                tableName: product_images
+                columnName: display_order
+      changes:
+        - addColumn:
+            tableName: product_images
+            columns:
+              - column:
+                  name: display_order
+                  type: INTEGER
+
+  - changeSet:
+      id: 15
+      author: antigravity
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - columnExists:
+                tableName: product_images
+                columnName: is_main
+      changes:
+        - addColumn:
+            tableName: product_images
+            columns:
+              - column:
+                  name: is_main
+                  type: BOOLEAN
+                  defaultValue: false

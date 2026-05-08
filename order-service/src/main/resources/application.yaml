@@ -1,0 +1,42 @@
+spring:
+  application:
+    name: order-service
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yml
+  cloud:
+    kubernetes:
+      discovery:
+        enabled: true
+        all-namespaces: false
+  main:
+    web-application-type: servlet
+  datasource:
+    url: jdbc:postgresql://localhost:5435/order_service
+    username: admin
+    password: secret123
+    driver-class-name: org.postgresql.Driver
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+logging:
+  level:
+    org.hibernate.SQL: OFF
+    org.hibernate.type.descriptor.sql: OFF
+    org.hibernate.orm.jdbc.bind: OFF

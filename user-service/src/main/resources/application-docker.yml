@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    # ✅ Docker network içinde postgres servis adına bağlan
+    url: jdbc:postgresql://user-db:5432/user_service
+    username: admin
+    password: secret123
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yml
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST:redis}
+      port: ${SPRING_DATA_REDIS_PORT:6379}

@@ -1,0 +1,31 @@
+databaseChangeLog:
+  - changeSet:
+      id: 3_seller_username
+      author: swaply
+      preConditions:
+        - onFail: MARK_RAN
+          columnExists:
+            tableName: sellers
+            columnName: name
+      changes:
+        - addColumn:
+            tableName: sellers
+            columns:
+              - column:
+                  name: username
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: true
+                    unique: true
+
+        - update:
+            tableName: sellers
+            columns:
+              - column:
+                  name: username
+                  value: name
+        
+        - addNotNullConstraint:
+            tableName: sellers
+            columnName: username
+            columnDataType: VARCHAR(100)

@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: media-service
+  datasource:
+    url: jdbc:postgresql://media-db:5432/media_service
+    username: admin
+    password: secret123
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+      enabled: true
+server:
+  port: 8080
+cloudinary:
+  cloud-name: dotf5ilyu
+  api-key: 386651582685313
+  api-secret: An8Aq5tc8eWnZjKnkgENE5AYlj0
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+
+
+
+
+
+
+
+
+
+
+  #   API SECRET - An8Aq5tc8eWnZjKnkgENE5AYlj0
+  #   API KEY - 386651582685313

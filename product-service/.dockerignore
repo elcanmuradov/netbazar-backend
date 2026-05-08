@@ -1,0 +1,15 @@
+# .dockerignore
+.git
+.gitignore
+*.md
+!README.md
+.idea
+.vscode
+*.iml
+.gradle
+build/
+target/
+!build/libs/*.jar
+docker-compose.yml
+k8s/
+Dockerfile

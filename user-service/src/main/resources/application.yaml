@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: user-service
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+  datasource:
+    url: jdbc:postgresql://user-db:5432/user_service
+    username: admin
+    password: secret123
+  security:
+    jwt:
+      secret: "BmotNKeNwGD6tal1SonRj7jtdXEXEYQlSECQcRbW6bpJYfYppEoGE0eIk1CvUX7VxhbI9MgR3ZOEzUWnlOvHNw"
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: none
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yml
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+logging:
+  level:
+    org.hibernate.SQL: OFF
+    org.hibernate.type.descriptor.sql: OFF
+    org.hibernate.orm.jdbc.bind: OFF

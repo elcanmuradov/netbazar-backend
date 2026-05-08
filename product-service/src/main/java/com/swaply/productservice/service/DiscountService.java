@@ -1,0 +1,296 @@
+package com.swaply.productservice.service;
+
+import com.swaply.productservice.dto.discount.DiscountRuleDto;
+import com.swaply.productservice.dto.discount.DiscountValidationResponse;
+import com.swaply.productservice.entity.DiscountRule;
+import com.swaply.productservice.entity.Product;
+import com.swaply.productservice.exception.NotFoundException;
+import com.swaply.productservice.repository.jpa.DiscountRuleRepository;
+import com.swaply.productservice.repository.jpa.ProductRepository;
+import com.swaply.productservice.utils.enums.DiscountType;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class DiscountService {
+
+    private final DiscountRuleRepository discountRuleRepository;
+    private final ProductRepository productRepository;
+
+    @Transactional
+    public DiscountRuleDto createDiscountRule(DiscountRuleDto dto) {
+        DiscountRule rule = DiscountRule.builder()
+                .code(dto.getCode())
+                .type(dto.getType())
+                .value(dto.getValue())
+                .minOrderAmount(dto.getMinOrderAmount())
+                .maxDiscountAmount(dto.getMaxDiscountAmount())
+                .startDate(dto.getStartDate())
+                .endDate(dto.getEndDate())
+                .usageLimit(dto.getUsageLimit())
+                .sellerId(dto.getSellerId())
+                .productId(dto.getProductId())
+                .minQuantity(dto.getMinQuantity())
+                .isActive(true)
+                .build();
+
+        DiscountRule saved = discountRuleRepository.save(rule);
+        return mapToDto(saved);
+    }
+
+    public List<DiscountRuleDto> getSellerDiscounts(UUID sellerId) {
+        return discountRuleRepository.findAllBySellerId(sellerId).stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<DiscountRuleDto> getPlatformDiscounts() {
+        return discountRuleRepository.findAllBySellerIdIsNull().stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+    }
+
+    public DiscountValidationResponse validateAndCalculate(String code, UUID productId, Integer quantity) {
+        return validateAndCalculate(code, productId, quantity, null);
+    }
+
+        public DiscountValidationResponse validateAndCalculate(String code, UUID productId, Integer quantity, BigDecimal baseAmount) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new NotFoundException("Product not found"));
+
+        BigDecimal orderAmount = baseAmount != null
+            ? baseAmount
+            : product.getPrice().multiply(BigDecimal.valueOf(quantity));
+
+        if (code == null || code.isEmpty()) {
+            return DiscountValidationResponse.builder()
+                    .valid(false)
+                    .message("No code provided")
+                    .discountAmount(BigDecimal.ZERO)
+                    .finalPrice(orderAmount)
+                    .build();
+        }
+
+        DiscountRule rule = discountRuleRepository.findByCodeAndIsActiveTrue(code)
+                .orElse(null);
+
+        if (rule == null) {
+            return DiscountValidationResponse.builder()
+                    .valid(false)
+                    .message("Invalid or inactive promo code")
+                    .discountAmount(BigDecimal.ZERO)
+                    .finalPrice(orderAmount)
+                    .build();
+        }
+
+        // Validate dates
+        LocalDateTime now = LocalDateTime.now();
+        if (rule.getStartDate() != null && now.isBefore(rule.getStartDate())) {
+            return DiscountValidationResponse.builder().valid(false).message("Discount not started yet").build();
+        }
+        if (rule.getEndDate() != null && now.isAfter(rule.getEndDate())) {
+            return DiscountValidationResponse.builder().valid(false).message("Discount expired").build();
+        }
+
+        // Validate usage limit
+        if (rule.getUsageLimit() != null && rule.getUsageCount() >= rule.getUsageLimit()) {
+            return DiscountValidationResponse.builder().valid(false).message("Usage limit reached").build();
+        }
+
+        // Validate min order amount
+        if (rule.getMinOrderAmount() != null && orderAmount.compareTo(rule.getMinOrderAmount()) < 0) {
+            return DiscountValidationResponse.builder()
+                    .valid(false)
+                    .message("Minimum order amount not met: " + rule.getMinOrderAmount())
+                    .build();
+        }
+
+        // Validate seller/product scope
+        if (rule.getSellerId() != null && !rule.getSellerId().equals(product.getUserId())) {
+            return DiscountValidationResponse.builder().valid(false).message("Code not valid for this seller").build();
+        }
+        if (rule.getProductId() != null && !rule.getProductId().equals(productId)) {
+            return DiscountValidationResponse.builder().valid(false).message("Code not valid for this product").build();
+        }
+
+        // Validate volume (quantity) requirement
+        if (rule.getMinQuantity() != null && quantity < rule.getMinQuantity()) {
+            return DiscountValidationResponse.builder()
+                    .valid(false)
+                    .message("Minimum quantity not met: " + rule.getMinQuantity())
+                    .build();
+        }
+
+        // Calculate discount
+        BigDecimal discountAmount;
+        if (rule.getType() == DiscountType.PERCENTAGE) {
+            discountAmount = orderAmount.multiply(rule.getValue()).divide(BigDecimal.valueOf(100), RoundingMode.HALF_UP);
+        } else {
+            discountAmount = rule.getValue();
+        }
+
+        // Cap discount
+        if (rule.getMaxDiscountAmount() != null && discountAmount.compareTo(rule.getMaxDiscountAmount()) > 0) {
+            discountAmount = rule.getMaxDiscountAmount();
+        }
+
+        // Ensure discount doesn't exceed order amount
+        if (discountAmount.compareTo(orderAmount) > 0) {
+            discountAmount = orderAmount;
+        }
+
+        return DiscountValidationResponse.builder()
+                .valid(true)
+                .message("Discount applied successfully")
+                .discountAmount(discountAmount)
+                .finalPrice(orderAmount.subtract(discountAmount))
+                .type(rule.getType())
+                .value(rule.getValue())
+                .code(code)
+                .build();
+    }
+
+    /**
+     * Validate discount code by total order amount (for checkout/bulk orders)
+     */
+    public DiscountValidationResponse validateByTotalAmount(String code, BigDecimal totalAmount) {
+        if (code == null || code.isEmpty()) {
+            return DiscountValidationResponse.builder()
+                    .valid(false)
+                    .message("No code provided")
+                    .discountAmount(BigDecimal.ZERO)
+                    .finalPrice(totalAmount)
+                    .build();
+        }
+
+        DiscountRule rule = discountRuleRepository.findByCodeAndIsActiveTrue(code)
+                .orElse(null);
+
+        if (rule == null) {
+            return DiscountValidationResponse.builder()
+                    .valid(false)
+                    .message("Promo kod etibarsızdır")
+                    .discountAmount(BigDecimal.ZERO)
+                    .finalPrice(totalAmount)
+                    .build();
+        }
+
+        // Validate dates
+        LocalDateTime now = LocalDateTime.now();
+        if (rule.getStartDate() != null && now.isBefore(rule.getStartDate())) {
+            return DiscountValidationResponse.builder()
+                    .valid(false)
+                    .message("Endirim hələ başlamamışdır")
+                    .build();
+        }
+        if (rule.getEndDate() != null && now.isAfter(rule.getEndDate())) {
+            return DiscountValidationResponse.builder()
+                    .valid(false)
+                    .message("Endirim müddəti sona çatmışdır")
+                    .build();
+        }
+
+        // Validate usage limit
+        if (rule.getUsageLimit() != null && rule.getUsageCount() >= rule.getUsageLimit()) {
+            return DiscountValidationResponse.builder()
+                    .valid(false)
+                    .message("Endirimin istifadə limiti çatmışdır")
+                    .build();
+        }
+
+        // Validate min order amount
+        if (rule.getMinOrderAmount() != null && totalAmount.compareTo(rule.getMinOrderAmount()) < 0) {
+            return DiscountValidationResponse.builder()
+                    .valid(false)
+                    .message("Minimum sifariş məbləği: " + rule.getMinOrderAmount() + " ₼")
+                    .build();
+        }
+
+        // Calculate discount (platform-wide discounts only for bulk orders)
+        if (rule.getSellerId() != null || rule.getProductId() != null) {
+            return DiscountValidationResponse.builder()
+                    .valid(false)
+                    .message("Bu promo kod toplu sifarişlər üçün keçərli deyil")
+                    .build();
+        }
+
+        // Calculate discount
+        BigDecimal discountAmount;
+        if (rule.getType() == DiscountType.PERCENTAGE) {
+            discountAmount = totalAmount.multiply(rule.getValue()).divide(BigDecimal.valueOf(100), RoundingMode.HALF_UP);
+        } else {
+            discountAmount = rule.getValue();
+        }
+
+        // Cap discount
+        if (rule.getMaxDiscountAmount() != null && discountAmount.compareTo(rule.getMaxDiscountAmount()) > 0) {
+            discountAmount = rule.getMaxDiscountAmount();
+        }
+
+        // Ensure discount doesn't exceed order amount
+        if (discountAmount.compareTo(totalAmount) > 0) {
+            discountAmount = totalAmount;
+        }
+
+        return DiscountValidationResponse.builder()
+                .valid(true)
+                .message("Promo kod uğurla tətbiq edildi")
+                .discountAmount(discountAmount)
+                .finalPrice(totalAmount.subtract(discountAmount))
+                .type(rule.getType())
+                .value(rule.getValue())
+                .code(code)
+                .build();
+    }
+
+    @Transactional
+    public void incrementUsage(String code) {
+        discountRuleRepository.findByCodeAndIsActiveTrue(code).ifPresent(rule -> {
+            rule.setUsageCount(rule.getUsageCount() + 1);
+            discountRuleRepository.save(rule);
+        });
+    }
+
+    public List<DiscountRuleDto> getDiscountReport(UUID sellerId) {
+        List<DiscountRule> rules = sellerId != null
+                ? discountRuleRepository.findAllBySellerId(sellerId)
+                : discountRuleRepository.findAllBySellerIdIsNull();
+        return rules.stream().map(this::mapToDto).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public DiscountRuleDto deactivateDiscount(UUID id) {
+        DiscountRule rule = discountRuleRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Discount rule not found: " + id));
+        rule.setIsActive(false);
+        return mapToDto(discountRuleRepository.save(rule));
+    }
+
+    private DiscountRuleDto mapToDto(DiscountRule rule) {
+        return DiscountRuleDto.builder()
+                .id(rule.getId())
+                .code(rule.getCode())
+                .type(rule.getType())
+                .value(rule.getValue())
+                .minOrderAmount(rule.getMinOrderAmount())
+                .maxDiscountAmount(rule.getMaxDiscountAmount())
+                .startDate(rule.getStartDate())
+                .endDate(rule.getEndDate())
+                .usageLimit(rule.getUsageLimit())
+                .usageCount(rule.getUsageCount())
+                .sellerId(rule.getSellerId())
+                .productId(rule.getProductId())
+                .minQuantity(rule.getMinQuantity())
+                .isActive(rule.getIsActive())
+                .build();
+    }
+}

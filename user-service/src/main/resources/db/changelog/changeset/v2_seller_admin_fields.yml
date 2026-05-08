@@ -1,0 +1,21 @@
+databaseChangeLog:
+  - changeSet:
+      id: 4
+      author: antigravity
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            - columnExists:
+                tableName: sellers
+                columnName: commission_rate
+      changes:
+        - addColumn:
+            tableName: sellers
+            columns:
+              - column:
+                  name: commission_rate
+                  type: DECIMAL(5,2)
+                  defaultValue: 10.00
+              - column:
+                  name: penalize_reason
+                  type: VARCHAR(500)
