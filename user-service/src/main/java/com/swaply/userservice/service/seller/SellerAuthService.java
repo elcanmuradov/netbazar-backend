@@ -47,7 +47,6 @@ public class SellerAuthService {
 
         Seller seller = Seller.builder()
                 .name(registerRequest.getName())
-                .username(registerRequest.getEmail())
                 .email(registerRequest.getEmail())
                 .phone(registerRequest.getPhone())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
@@ -56,6 +55,7 @@ public class SellerAuthService {
                 .status(AccountStatus.ACTIVE)
                 .createdAt(LocalDateTime.now())
                 .build();
+        seller.setUsername(registerRequest.getEmail());
 
         seller = sellerRepository.save(seller);
 

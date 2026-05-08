@@ -97,7 +97,17 @@ public class Seller implements UserDetails {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-
+    /**
+     * DB column {@code username} is required; {@link #getUsername()} returns {@code email} for Spring Security.
+     * Ensures the persisted column is never null if only email was set.
+     */
+    @PrePersist
+    @PreUpdate
+    private void syncUsernameColumnFromEmail() {
+        if ((username == null || username.isBlank()) && email != null && !email.isBlank()) {
+            username = email;
+        }
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
