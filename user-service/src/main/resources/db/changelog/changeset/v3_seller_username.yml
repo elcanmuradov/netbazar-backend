@@ -16,14 +16,21 @@ databaseChangeLog:
                   type: VARCHAR(100)
                   constraints:
                     nullable: true
-                    unique: true
 
-        - update:
+        - sql:
+            sql: >
+              UPDATE sellers 
+              SET username = CASE 
+                WHEN EXISTS (SELECT 1 FROM sellers s2 WHERE s2.name = sellers.name AND s2.id != sellers.id)
+                THEN name || '_' || SUBSTRING(id::text, 1, 8)
+                ELSE name
+              END
+            dbms: postgresql
+
+        - addUniqueConstraint:
             tableName: sellers
-            columns:
-              - column:
-                  name: username
-                  value: name
+            columnNames: username
+            constraintName: sellers_username_key
         
         - addNotNullConstraint:
             tableName: sellers
