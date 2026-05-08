@@ -116,13 +116,21 @@ public class CommerceService {
 
         List<PreparedItem> preparedItems = new ArrayList<>();
         BigDecimal totalAfterCampaign = BigDecimal.ZERO;
+        UUID cartSellerId = null;
+        boolean hasMultipleSellers = false;
 
         for (BulkOrderItemRequest itemRequest : request.getItems()) {
             if (itemRequest == null || itemRequest.getProductId() == null) {
                 throw new IllegalArgumentException("Məhsul məlumatı natamamdır");
             }
 
-                ProductClient.ProductSummary product = getProductOrThrow(itemRequest.getProductId());
+            ProductClient.ProductSummary product = getProductOrThrow(itemRequest.getProductId());
+
+            if (cartSellerId == null) {
+                cartSellerId = product.userId();
+            } else if (!cartSellerId.equals(product.userId())) {
+                hasMultipleSellers = true;
+            }
 
             int quantity = itemRequest.getQuantity() != null && itemRequest.getQuantity() > 0 ? itemRequest.getQuantity() : 1;
 
@@ -145,7 +153,12 @@ public class CommerceService {
         String appliedCode = null;
 
         if (request.getDiscountCode() != null && !request.getDiscountCode().isBlank()) {
-            DiscountValidationResponse validation = discountService.validateByTotalAmount(request.getDiscountCode(), totalAfterCampaign);
+            UUID sellerScopeId = hasMultipleSellers ? null : cartSellerId;
+            DiscountValidationResponse validation = discountService.validateByTotalAmount(
+                    request.getDiscountCode(),
+                    totalAfterCampaign,
+                    sellerScopeId
+            );
             if (!validation.isValid()) {
                 throw new IllegalArgumentException(validation.getMessage());
             }

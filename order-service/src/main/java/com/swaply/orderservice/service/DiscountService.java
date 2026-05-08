@@ -1,13 +1,14 @@
 package com.swaply.orderservice.service;
 
+import com.swaply.orderservice.client.ProductClient;
 import com.swaply.orderservice.dto.discount.DiscountRuleDto;
 import com.swaply.orderservice.dto.discount.DiscountValidationResponse;
-import com.swaply.orderservice.client.ProductClient;
 import com.swaply.orderservice.entity.DiscountRule;
 import com.swaply.orderservice.exception.NotFoundException;
 import com.swaply.orderservice.repository.jpa.DiscountRuleRepository;
 import com.swaply.orderservice.utils.enums.DiscountType;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DiscountService {
@@ -62,12 +64,13 @@ public class DiscountService {
         return validateAndCalculate(code, productId, quantity, null);
     }
 
-        public DiscountValidationResponse validateAndCalculate(String code, UUID productId, Integer quantity, BigDecimal baseAmount) {
+    public DiscountValidationResponse validateAndCalculate(String code, UUID productId, Integer quantity, BigDecimal baseAmount) {
         ProductClient.ProductSummary product = getProductOrThrow(productId);
+        log.info(product.toString());
 
         BigDecimal orderAmount = baseAmount != null
-            ? baseAmount
-            : product.priceAsBigDecimal().multiply(BigDecimal.valueOf(quantity));
+                ? baseAmount
+                : product.priceAsBigDecimal().multiply(BigDecimal.valueOf(quantity));
 
         if (code == null || code.isEmpty()) {
             return DiscountValidationResponse.builder()
@@ -89,8 +92,7 @@ public class DiscountService {
                     .finalPrice(orderAmount)
                     .build();
         }
-
-        // Validate dates
+        log.info(rule.toString());
         LocalDateTime now = LocalDateTime.now();
         if (rule.getStartDate() != null && now.isBefore(rule.getStartDate())) {
             return DiscountValidationResponse.builder().valid(false).message("Discount not started yet").build();
@@ -99,12 +101,10 @@ public class DiscountService {
             return DiscountValidationResponse.builder().valid(false).message("Discount expired").build();
         }
 
-        // Validate usage limit
         if (rule.getUsageLimit() != null && rule.getUsageCount() >= rule.getUsageLimit()) {
             return DiscountValidationResponse.builder().valid(false).message("Usage limit reached").build();
         }
 
-        // Validate min order amount
         if (rule.getMinOrderAmount() != null && orderAmount.compareTo(rule.getMinOrderAmount()) < 0) {
             return DiscountValidationResponse.builder()
                     .valid(false)
@@ -112,15 +112,10 @@ public class DiscountService {
                     .build();
         }
 
-        // Validate seller/product scope
         if (rule.getSellerId() != null && !rule.getSellerId().equals(product.userId())) {
             return DiscountValidationResponse.builder().valid(false).message("Code not valid for this seller").build();
         }
-        if (rule.getProductId() != null && !rule.getProductId().equals(productId)) {
-            return DiscountValidationResponse.builder().valid(false).message("Code not valid for this product").build();
-        }
 
-        // Validate volume (quantity) requirement
         if (rule.getMinQuantity() != null && quantity < rule.getMinQuantity()) {
             return DiscountValidationResponse.builder()
                     .valid(false)
@@ -128,7 +123,6 @@ public class DiscountService {
                     .build();
         }
 
-        // Calculate discount
         BigDecimal discountAmount;
         if (rule.getType() == DiscountType.PERCENTAGE) {
             discountAmount = orderAmount.multiply(rule.getValue()).divide(BigDecimal.valueOf(100), RoundingMode.HALF_UP);
@@ -136,12 +130,10 @@ public class DiscountService {
             discountAmount = rule.getValue();
         }
 
-        // Cap discount
         if (rule.getMaxDiscountAmount() != null && discountAmount.compareTo(rule.getMaxDiscountAmount()) > 0) {
             discountAmount = rule.getMaxDiscountAmount();
         }
 
-        // Ensure discount doesn't exceed order amount
         if (discountAmount.compareTo(orderAmount) > 0) {
             discountAmount = orderAmount;
         }
@@ -157,10 +149,7 @@ public class DiscountService {
                 .build();
     }
 
-    /**
-     * Validate discount code by total order amount (for checkout/bulk orders)
-     */
-    public DiscountValidationResponse validateByTotalAmount(String code, BigDecimal totalAmount) {
+    public DiscountValidationResponse validateByTotalAmount(String code, BigDecimal totalAmount, UUID sellerId) {
         if (code == null || code.isEmpty()) {
             return DiscountValidationResponse.builder()
                     .valid(false)
@@ -213,8 +202,18 @@ public class DiscountService {
                     .build();
         }
 
-        // Calculate discount (platform-wide discounts only for bulk orders)
-        if (rule.getSellerId() != null || rule.getProductId() != null) {
+        // Seller-specific discounts must be matched against the seller that owns the cart items.
+        if (rule.getSellerId() != null) {
+            if (sellerId == null || !rule.getSellerId().equals(sellerId)) {
+                return DiscountValidationResponse.builder()
+                        .valid(false)
+                        .message("Bu promo kod bu satıcı üçün keçərli deyil")
+                        .build();
+            }
+        }
+
+        // Reject product-specific discounts for bulk orders.
+        if (rule.getProductId() != null) {
             return DiscountValidationResponse.builder()
                     .valid(false)
                     .message("Bu promo kod toplu sifarişlər üçün keçərli deyil")
@@ -270,6 +269,12 @@ public class DiscountService {
         // Note: In a real implementation, you would call UserClient to get seller ID by username
         // For now, this is a placeholder that can be extended
         return List.of();
+    }
+
+    public DiscountRuleDto getDiscountInfo(String code) {
+        DiscountRule rule = discountRuleRepository.findByCodeAndIsActiveTrue(code)
+                .orElseThrow(() -> new NotFoundException("Discount rule not found: " + code));
+        return mapToDto(rule);
     }
 
     @Transactional

@@ -22,7 +22,7 @@ public class EmailContext {
             <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Swaply - Email Təsdiqi</title>
+                <title>Netbazar - Email Təsdiqi</title>
                 <style>
                     * {
                         margin: 0;
@@ -193,7 +193,7 @@ public class EmailContext {
                         <h1 class="greeting">Emailinizi Təsdiqləyin</h1>
             
                         <p class="message">
-                            Salam! Swaply hesabınızı yaratdığınız üçün təşəkkür edirik.\s
+                            Salam! Netbazar hesabınızı yaratdığınız üçün təşəkkür edirik.\s
                             Hesabınızı aktivləşdirmək üçün aşağıdakı təsdiq kodundan istifadə edin.
                         </p>
             
@@ -204,7 +204,6 @@ public class EmailContext {
                             <div class="expiry">⏱ Kod 2 dəqiqə etibarlıdır</div>
                         </div>
             
-                      
             
                         <div class="divider"></div>
             
@@ -218,19 +217,19 @@ public class EmailContext {
                     <!-- Footer -->
                     <div class="footer">
                         <p class="footer-text">
-                            Bu emaili <strong>Swaply</strong> komandası göndərdi.
+                            Bu emaili <strong>Netbazar</strong> komandası göndərdi.
                             <br>
                             Əgər bu qeydiyyatı siz etməmisinizsə, bu emaili nəzərə almayın.
                         </p>
             
                         <div class="social-links">
-                            <a href="www.swaply.dev">Website</a> |\s
-                            <a href="www.swaply.dev/support">Support</a> |\s
+                            <a href="www.netbazar.tech">Website</a> |\s
+                            <a href="www.netbazar.tech/support">Support</a> |\s
                             <a href="#">Privacy Policy</a>
                         </div>
             
                         <p class="footer-text" style="margin-top: 20px; font-size: 12px;">
-                            © 2026 Swaply. Bütün hüquqlar qorunur.
+                            © 2026 Netbazar. Bütün hüquqlar qorunur.
                         </p>
                     </div>
                 </div>
@@ -251,7 +250,7 @@ public class EmailContext {
                 <head>
                     <meta charset="UTF-8">
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>Swaply - Məhsul Silindi</title>
+                    <title>Netbazar - Məhsul Silindi</title>
                     <style>
                         * {
                             margin: 0;
@@ -494,20 +493,20 @@ public class EmailContext {
 
                         <div class="footer">
                             <p class="footer-text">
-                                Bu emaili <strong>Swaply</strong> komandası göndərdi.
+                                Bu emaili <strong>Netbazar</strong> komandası göndərdi.
                                 <br>
                                 Bu, avtomatik göndərilən bildiriş emailidir.
                             </p>
 
                             <div class="social-links">
-                                <a href="www.swaply.dev">Website</a> |
-                                <a href="www.swaply.dev/support">Support</a> |
+                                <a href="www.netbazar.tech">Website</a> |
+                                <a href="www.netbazar.tech/support">Support</a> |
                                 <a href="#">Privacy Policy</a> |
                                 <a href="#">Community Guidelines</a>
                             </div>
 
                             <p class="footer-text" style="margin-top: 20px; font-size: 12px;">
-                                © 2026 Swaply. Bütün hüquqlar qorunur.
+                                © 2026 Netbazar. Bütün hüquqlar qorunur.
                             </p>
                         </div>
                     </div>
@@ -523,7 +522,7 @@ public class EmailContext {
                         <head>
                             <meta charset="UTF-8">
                             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                            <title>Swaply - Dəstək Cavabı</title>
+                            <title>Netbazar - Dəstək Cavabı</title>
                             <style>
                                 * {
                                     margin: 0;
@@ -858,7 +857,7 @@ public class EmailContext {
                 
                             <p class="message">
                                 Salam <strong>%s</strong>,<br><br>
-                                Swaply Dəstək Komandası müraciətinizi nəzərdən keçirdi və aşağıda cavabını tapa bilərsiniz.
+                                Netbazar Dəstək Komandası müraciətinizi nəzərdən keçirdi və aşağıda cavabını tapa bilərsiniz.
                             </p>
                 
                             <!-- Ticket Info -->
@@ -892,7 +891,7 @@ public class EmailContext {
                             <div class="section-title">✅ Komandamızın Cavabı</div>
                             <div class="message-box admin-message">
                                 <div class="message-header">
-                                    <span class="message-sender">Swaply Dəstək</span>
+                                    <span class="message-sender">Netbazar Dəstək</span>
                                     <span class="message-date">%s</span>
                                 </div>
                                 <div class="message-content">%s</div>
@@ -901,13 +900,13 @@ public class EmailContext {
                             <!-- Admin Signature -->
                             <div class="admin-signature">
                                 <div class="admin-name">Elcan Muradov</div>
-                                <div class="admin-role">Elcan • Swaply Support Team</div>
+                                <div class="admin-role">Elcan • Netbazar Support Team</div>
                             </div>
                 
                             <!-- Action Buttons -->
                             <div class="btn-group">
-                                <a href="https://www.swaply.dev/support" class="btn">Müraciəti Bax</a>
-                                <a href="https://www.swaply.dev/support" class="btn btn-secondary">Cavab Yaz</a>
+                                <a href="https://www.netbazar.tech/support" class="btn">Müraciəti Bax</a>
+                                <a href="https://www.netbazar.tech/support" class="btn btn-secondary">Cavab Yaz</a>
                             </div>
                 
                             <div class="divider"></div>
@@ -928,20 +927,20 @@ public class EmailContext {
                         <!-- Footer -->
                         <div class="footer">
                             <p class="footer-text">
-                                Bu emaili <strong>Swaply</strong> Dəstək Komandası göndərdi.
+                                Bu emaili <strong>Netbazar</strong> Dəstək Komandası göndərdi.
                                 <br>
                                 Bu, avtomatik göndərilən bildiriş emailidir. Zəhmət olmasa cavab verməyin.
                             </p>
                 
                             <div class="social-links">
-                                <a href="https://www.swaply.dev">Website</a> |
-                                <a href="https://www.swaply.dev/support">Support</a> |
+                                <a href="https://www.netbazar.tech">Website</a> |
+                                <a href="https://www.netbazar.tech/support">Support</a> |
                                 <a href="#">Privacy Policy</a> |
                                 <a href="#">Knowledge Base</a>
                             </div>
                 
                             <p class="footer-text" style="margin-top: 20px; font-size: 12px;">
-                                © 2025 Swaply. Bütün hüquqlar qorunur.
+                                © 2025 Netbazar. Bütün hüquqlar qorunur.
                             </p>
                         </div>
                     </div>

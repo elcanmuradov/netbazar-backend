@@ -66,8 +66,9 @@ public class DiscountController {
     @GetMapping("/validate/{code}")
     public ResponseEntity<ApiResponse<DiscountValidationResponse>> validateByCode(
             @PathVariable String code,
-            @RequestParam BigDecimal totalAmount) {
-        return ResponseEntity.ok(ApiResponse.success(discountService.validateByTotalAmount(code, totalAmount)));
+            @RequestParam BigDecimal totalAmount,
+            @RequestParam(required = false) UUID sellerId) {
+        return ResponseEntity.ok(ApiResponse.success(discountService.validateByTotalAmount(code, totalAmount, sellerId)));
     }
 
     @PutMapping("/{id}/deactivate")
@@ -84,6 +85,11 @@ public class DiscountController {
     @GetMapping("/seller/{sellerId}/codes")
     public ResponseEntity<ApiResponse<List<DiscountRuleDto>>> getSellerAvailableDiscounts(@PathVariable UUID sellerId) {
         return ResponseEntity.ok(ApiResponse.success(discountService.getSellerDiscounts(sellerId)));
+    }
+
+    @GetMapping("/info/{code}")
+    public ResponseEntity<ApiResponse<DiscountRuleDto>> getDiscountInfo(@PathVariable String code) {
+        return ResponseEntity.ok(ApiResponse.success(discountService.getDiscountInfo(code)));
     }
 }
 
