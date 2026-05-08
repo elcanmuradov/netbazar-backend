@@ -24,7 +24,7 @@ public class NotificationService {
 
     private final ObjectProvider<JavaMailSender> mailSenderProvider;
 
-    @Value("${FROM_EMAIL:}")
+    @Value("${FROM_EMAIL:${SPRING_MAIL_USERNAME:}}")
     private String fromEmail;
 
     @Value("${MAIL_ENABLED:true}")
