@@ -50,12 +50,12 @@ public class SellerAuthService {
                 .email(registerRequest.getEmail())
                 .phone(registerRequest.getPhone())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
+                .username(registerRequest.getEmail())
                 .productCount(0L)
                 .paymentsTotal(BigDecimal.valueOf(0))
                 .status(AccountStatus.ACTIVE)
                 .createdAt(LocalDateTime.now())
                 .build();
-        seller.setUsername(registerRequest.getEmail());
 
         seller = sellerRepository.save(seller);
 
