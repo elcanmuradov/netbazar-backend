@@ -10,11 +10,6 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yml
-  cloud:
-    kubernetes:
-      discovery:
-        enabled: true
-        all-namespaces: false
   main:
     web-application-type: servlet
   datasource:
