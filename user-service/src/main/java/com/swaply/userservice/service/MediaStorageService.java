@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.ByteArrayResource;
 
 
 @Slf4j
@@ -26,7 +27,13 @@ public class MediaStorageService {
         try {
             log.info("Starting upload profile photo for user: {}", userEmail);
             User user = userRepository.findByEmail(userEmail).orElseThrow(()->new AuthException("User not found with username: " + userEmail));
-            var media = mediaClient.uploadBytes(fileBytes, originalFilename);
+            ByteArrayResource resource = new ByteArrayResource(fileBytes) {
+                @Override
+                public String getFilename() {
+                    return originalFilename;
+                }
+            };
+            var media = mediaClient.uploadBytes(resource);
             user.setProfileImageUrl(media.getData().get("url"));
             userRepository.save(user);
         }catch (Exception e){
@@ -39,7 +46,13 @@ public class MediaStorageService {
         try {
             log.info("Starting upload banner photo for seller: {}", sellerEmail);
             Seller seller = sellerRepository.findByEmail(sellerEmail).orElseThrow(()->new AuthException("User not found with username: " + sellerEmail));
-            var media = mediaClient.uploadBytes(fileBytes, originalFilename);
+            ByteArrayResource resource = new ByteArrayResource(fileBytes) {
+                @Override
+                public String getFilename() {
+                    return originalFilename;
+                }
+            };
+            var media = mediaClient.uploadBytes(resource);
             seller.setBannerImageUrl(media.getData().get("url"));
             sellerRepository.save(seller);
         }catch (Exception e){
@@ -52,7 +65,13 @@ public class MediaStorageService {
         try {
             log.info("Starting upload profile photo for seller: {}", sellerEmail);
             Seller seller = sellerRepository.findByEmail(sellerEmail).orElseThrow(()->new AuthException("User not found with username: " + sellerEmail));
-            var media = mediaClient.uploadBytes(fileBytes, originalFilename);
+            ByteArrayResource resource = new ByteArrayResource(fileBytes) {
+                @Override
+                public String getFilename() {
+                    return originalFilename;
+                }
+            };
+            var media = mediaClient.uploadBytes(resource);
             seller.setProfileImageUrl(media.getData().get("url"));
             sellerRepository.save(seller);
         }catch (Exception e){
