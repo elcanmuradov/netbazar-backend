@@ -57,7 +57,7 @@ public class ProductController {
     @PostMapping(path = "user/{userId}/product/create", consumes = "multipart/form-data")
     public ResponseEntity<ApiResponse<CreateProductResponse>> create(
             @RequestPart("request") @Valid CreateProductRequest request,
-            @RequestPart("files") List<MultipartFile> files) {
+            @RequestPart(value = "files", required = false) List<MultipartFile> files) {
         return ResponseEntity.ok(ApiResponse.success(productService.createProduct(request, files)));
     }
 
