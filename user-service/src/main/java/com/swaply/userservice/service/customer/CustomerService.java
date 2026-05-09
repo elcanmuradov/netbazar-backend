@@ -46,8 +46,18 @@ public class CustomerService {
     }
 
     public UserDto getUserProfile(Authentication authentication) {
-        User user = userRepository.findByEmail(authentication.getName()).orElseThrow(() -> new AuthException(authentication.getName() + " User not found"));
-        return userMapper.entityToDto(user);
+        String email = authentication.getName();
+
+        var user = userRepository.findByEmail(email);
+        if (user.isPresent()) return userMapper.entityToDto(user.get());
+
+        var seller = sellerRepository.findByEmail(email);
+        if (seller.isPresent()) return userMapper.sellerToDto(seller.get());
+
+        var admin = adminRepository.findByEmail(email);
+        if (admin.isPresent()) return userMapper.adminToDto(admin.get());
+
+        throw new AuthException(email + " User not found");
     }
 
     public UserDto addProductToFavorites(UUID id, Authentication authentication) {
