@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.core.io.ByteArrayResource;
 
 
@@ -41,41 +40,43 @@ public class MediaStorageService {
         }
     }
 
-    @Async
     public void uploadBannerPhoto(byte[] fileBytes, String originalFilename, String sellerEmail) {
-        try {
-            log.info("Starting upload banner photo for seller: {}", sellerEmail);
-            Seller seller = sellerRepository.findByEmail(sellerEmail).orElseThrow(()->new AuthException("User not found with username: " + sellerEmail));
-            ByteArrayResource resource = new ByteArrayResource(fileBytes) {
-                @Override
-                public String getFilename() {
-                    return originalFilename;
-                }
-            };
-            var media = mediaClient.uploadBytes(resource);
-            seller.setBannerImageUrl(media.getData().get("url"));
-            sellerRepository.save(seller);
-        }catch (Exception e){
-            log.error("Error uploading banner photo for seller: {}", sellerEmail, e);
+        log.info("Starting upload banner photo for seller: {}", sellerEmail);
+        Seller seller = sellerRepository.findByEmail(sellerEmail)
+                .orElseThrow(() -> new AuthException("User not found with username: " + sellerEmail));
+        ByteArrayResource resource = new ByteArrayResource(fileBytes) {
+            @Override
+            public String getFilename() {
+                return originalFilename;
+            }
+        };
+        var media = mediaClient.uploadBytes(resource);
+        if (media == null || media.getData() == null || media.getData().get("url") == null) {
+            log.error("Media service returned no URL for banner upload (seller: {})", sellerEmail);
+            throw new AuthException("Media service banner üçün URL qaytarmadı");
         }
+        seller.setBannerImageUrl(media.getData().get("url"));
+        sellerRepository.save(seller);
+        log.info("Banner saved for seller {} -> {}", sellerEmail, media.getData().get("url"));
     }
 
-    @Async
     public void uploadProfilePhotoForSeller(byte[] fileBytes, String originalFilename, String sellerEmail) {
-        try {
-            log.info("Starting upload profile photo for seller: {}", sellerEmail);
-            Seller seller = sellerRepository.findByEmail(sellerEmail).orElseThrow(()->new AuthException("User not found with username: " + sellerEmail));
-            ByteArrayResource resource = new ByteArrayResource(fileBytes) {
-                @Override
-                public String getFilename() {
-                    return originalFilename;
-                }
-            };
-            var media = mediaClient.uploadBytes(resource);
-            seller.setProfileImageUrl(media.getData().get("url"));
-            sellerRepository.save(seller);
-        }catch (Exception e){
-            log.error("Error uploading profile photo for seller: {}", sellerEmail, e);
+        log.info("Starting upload profile photo for seller: {}", sellerEmail);
+        Seller seller = sellerRepository.findByEmail(sellerEmail)
+                .orElseThrow(() -> new AuthException("User not found with username: " + sellerEmail));
+        ByteArrayResource resource = new ByteArrayResource(fileBytes) {
+            @Override
+            public String getFilename() {
+                return originalFilename;
+            }
+        };
+        var media = mediaClient.uploadBytes(resource);
+        if (media == null || media.getData() == null || media.getData().get("url") == null) {
+            log.error("Media service returned no URL for profile photo upload (seller: {})", sellerEmail);
+            throw new AuthException("Media service profil fotosu üçün URL qaytarmadı");
         }
+        seller.setProfileImageUrl(media.getData().get("url"));
+        sellerRepository.save(seller);
+        log.info("Profile photo saved for seller {} -> {}", sellerEmail, media.getData().get("url"));
     }
 }

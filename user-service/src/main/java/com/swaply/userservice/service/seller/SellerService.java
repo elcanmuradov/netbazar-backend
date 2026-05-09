@@ -106,17 +106,16 @@ public class SellerService {
             if (authentication == null || authentication.getName() == null) {
                 throw new AuthException("Kimlik doğrulaması gereklidir");
             }
+            if (file == null || file.isEmpty()) {
+                throw new AuthException("Fayl boşdur");
+            }
             byte[] fileBytes = file.getBytes();
             String originalFilename = file.getOriginalFilename();
+            // Synchronously upload + persist real media URL on the seller
             mediaStorageService.uploadBannerPhoto(fileBytes, originalFilename, authentication.getName());
-            
-            // Update seller's banner URL in database
-            Seller seller = sellerRepository.findByEmail(authentication.getName())
-                    .orElseThrow(() -> new AuthException("Satıcı tapılmadı"));
-            seller.setBannerImageUrl(file.getOriginalFilename());
-            sellerRepository.save(seller);
-            
             log.info("Banner photo uploaded for seller: {}", authentication.getName());
+        } catch (AuthException e) {
+            throw e;
         } catch (Exception e) {
             log.error("Error uploading banner photo", e);
             throw new AuthException("Banner fotoğrafı yüklenirken hata oluştu");
@@ -128,17 +127,16 @@ public class SellerService {
             if (authentication == null || authentication.getName() == null) {
                 throw new AuthException("Kimlik doğrulaması gereklidir");
             }
+            if (file == null || file.isEmpty()) {
+                throw new AuthException("Fayl boşdur");
+            }
             byte[] fileBytes = file.getBytes();
             String originalFilename = file.getOriginalFilename();
+            // Synchronously upload + persist real media URL on the seller
             mediaStorageService.uploadProfilePhotoForSeller(fileBytes, originalFilename, authentication.getName());
-            
-            // Update seller's profile photo URL in database
-            Seller seller = sellerRepository.findByEmail(authentication.getName())
-                    .orElseThrow(() -> new AuthException("Satıcı tapılmadı"));
-            seller.setProfileImageUrl(file.getOriginalFilename());
-            sellerRepository.save(seller);
-            
             log.info("Profile photo uploaded for seller: {}", authentication.getName());
+        } catch (AuthException e) {
+            throw e;
         } catch (Exception e) {
             log.error("Error uploading profile photo", e);
             throw new AuthException("Profil fotoğrafı yüklenirken hata oluştu");
