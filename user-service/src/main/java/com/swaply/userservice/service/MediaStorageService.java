@@ -22,11 +22,11 @@ public class MediaStorageService {
     private final MediaClient mediaClient;
 
     @Async
-    public void uploadProfilePhotoAsync(MultipartFile file, String userEmail) {
+    public void uploadProfilePhotoAsync(byte[] fileBytes, String originalFilename, String userEmail) {
         try {
             log.info("Starting upload profile photo for user: {}", userEmail);
             User user = userRepository.findByEmail(userEmail).orElseThrow(()->new AuthException("User not found with username: " + userEmail));
-            var media = mediaClient.upload(file);
+            var media = mediaClient.uploadBytes(fileBytes, originalFilename);
             user.setProfileImageUrl(media.getData().get("url"));
             userRepository.save(user);
         }catch (Exception e){
@@ -35,28 +35,28 @@ public class MediaStorageService {
     }
 
     @Async
-    public void uploadBannerPhoto(MultipartFile file, String sellerEmail) {
+    public void uploadBannerPhoto(byte[] fileBytes, String originalFilename, String sellerEmail) {
         try {
-            log.info("Starting upload profile photo for user: {}", sellerEmail);
+            log.info("Starting upload banner photo for seller: {}", sellerEmail);
             Seller seller = sellerRepository.findByEmail(sellerEmail).orElseThrow(()->new AuthException("User not found with username: " + sellerEmail));
-            var media = mediaClient.upload(file);
+            var media = mediaClient.uploadBytes(fileBytes, originalFilename);
             seller.setBannerImageUrl(media.getData().get("url"));
             sellerRepository.save(seller);
         }catch (Exception e){
-            log.error("Error uploading profile photo for user: {}", sellerEmail, e);
+            log.error("Error uploading banner photo for seller: {}", sellerEmail, e);
         }
     }
 
     @Async
-    public void uploadProfilePhotoForSeller(MultipartFile file, String sellerEmail) {
+    public void uploadProfilePhotoForSeller(byte[] fileBytes, String originalFilename, String sellerEmail) {
         try {
-            log.info("Starting upload profile photo for user: {}", sellerEmail);
+            log.info("Starting upload profile photo for seller: {}", sellerEmail);
             Seller seller = sellerRepository.findByEmail(sellerEmail).orElseThrow(()->new AuthException("User not found with username: " + sellerEmail));
-            var media = mediaClient.upload(file);
+            var media = mediaClient.uploadBytes(fileBytes, originalFilename);
             seller.setProfileImageUrl(media.getData().get("url"));
             sellerRepository.save(seller);
         }catch (Exception e){
-            log.error("Error uploading profile photo for user: {}", sellerEmail, e);
+            log.error("Error uploading profile photo for seller: {}", sellerEmail, e);
         }
     }
 }

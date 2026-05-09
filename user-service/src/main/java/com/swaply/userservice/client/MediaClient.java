@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.ByteArrayResource;
 
 import java.util.Map;
 
@@ -20,4 +21,7 @@ public interface MediaClient {
 
     @PostMapping(value = "/media/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ApiResponse<Map<String, String>> upload(@RequestPart("file") MultipartFile file);
+    
+    @PostMapping(value = "/media/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    ApiResponse<Map<String, String>> uploadBytes(@RequestPart("file") ByteArrayResource file);
 }

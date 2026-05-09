@@ -121,8 +121,11 @@ public class CustomerService {
 
     public void changeProfilePhoto(MultipartFile file, Authentication authentication) {
         try {
+            byte[] fileBytes = file.getBytes();
+            String originalFilename = file.getOriginalFilename();
             mediaStorageService.uploadProfilePhotoAsync(
-                    file,
+                    fileBytes,
+                    originalFilename,
                     authentication.getName()
             );
         } catch (Exception e) {

@@ -106,7 +106,9 @@ public class SellerService {
             if (authentication == null || authentication.getName() == null) {
                 throw new AuthException("Kimlik doğrulaması gereklidir");
             }
-            mediaStorageService.uploadBannerPhoto(file, authentication.getName());
+            byte[] fileBytes = file.getBytes();
+            String originalFilename = file.getOriginalFilename();
+            mediaStorageService.uploadBannerPhoto(fileBytes, originalFilename, authentication.getName());
             
             // Update seller's banner URL in database
             Seller seller = sellerRepository.findByEmail(authentication.getName())
@@ -126,7 +128,9 @@ public class SellerService {
             if (authentication == null || authentication.getName() == null) {
                 throw new AuthException("Kimlik doğrulaması gereklidir");
             }
-            mediaStorageService.uploadProfilePhotoForSeller(file, authentication.getName());
+            byte[] fileBytes = file.getBytes();
+            String originalFilename = file.getOriginalFilename();
+            mediaStorageService.uploadProfilePhotoForSeller(fileBytes, originalFilename, authentication.getName());
             
             // Update seller's profile photo URL in database
             Seller seller = sellerRepository.findByEmail(authentication.getName())
