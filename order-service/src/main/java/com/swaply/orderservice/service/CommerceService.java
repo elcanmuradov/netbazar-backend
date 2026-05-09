@@ -329,13 +329,13 @@ public class CommerceService {
         List<CustomerOrder> orders = customerOrderRepository.findBySellerIdOrderByCreatedAtDesc(sellerId);
         long activeProducts = getActiveProductCount(sellerId);
         long dailyOrders = orders.stream()
-                .filter(o -> o.getCreatedAt().atZone(ZoneId.systemDefault()).toLocalDate().equals(LocalDate.now()))
+                .filter(o -> o.getCreatedAt() != null && o.getCreatedAt().atZone(ZoneId.systemDefault()).toLocalDate().equals(LocalDate.now()))
                 .count();
         long ordersInProgress = orders.stream()
                 .filter(o -> !o.getStatus().equals("DELIVERED") && !o.getStatus().equals("CANCELLED"))
                 .count();
         BigDecimal revenueToday = orders.stream()
-                .filter(o -> o.getCreatedAt().atZone(ZoneId.systemDefault()).toLocalDate().equals(LocalDate.now()))
+                .filter(o -> o.getCreatedAt() != null && o.getCreatedAt().atZone(ZoneId.systemDefault()).toLocalDate().equals(LocalDate.now()))
                 .map(CustomerOrder::getTotalPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 

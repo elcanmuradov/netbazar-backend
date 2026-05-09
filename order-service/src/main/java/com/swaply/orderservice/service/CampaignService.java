@@ -36,7 +36,7 @@ public class CampaignService {
     public List<CampaignDto> getCampaignsByStatus(Boolean active) {
         return campaignRepository.findAll()
                 .stream()
-                .filter(c -> c.getIsActive().equals(active))
+                .filter(c -> java.util.Objects.equals(c.getIsActive(), active))
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }
@@ -99,7 +99,7 @@ public class CampaignService {
     }
 
     private boolean isCurrentlyActive(Campaign campaign) {
-        if (!campaign.getIsActive()) {
+        if (campaign == null || !Boolean.TRUE.equals(campaign.getIsActive())) {
             return false;
         }
 
